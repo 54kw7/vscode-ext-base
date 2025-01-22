@@ -1,8 +1,11 @@
-import { ExtensionContext, WebviewPanel } from "vscode";
+import { ExtensionContext, WebviewView, WebviewViewProvider } from "vscode";
 import { HandlerConfig } from "@jsonrpc-rx/server";
 import { AbstractViewProvider } from "./abstract";
 
-export class ViewProviderPanel extends AbstractViewProvider {
+export class ViewProviderSidebar
+  extends AbstractViewProvider
+  implements WebviewViewProvider
+{
   constructor(context: ExtensionContext, handlers: HandlerConfig) {
     super(context, handlers, {
       distDir: "out/webview",
@@ -10,7 +13,7 @@ export class ViewProviderPanel extends AbstractViewProvider {
     });
   }
 
-  async resolveWebviewView(webviewView: WebviewPanel) {
+  async resolveWebviewView(webviewView: WebviewView) {
     const { webview } = webviewView;
     webview.options = {
       enableScripts: true,

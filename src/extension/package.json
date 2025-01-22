@@ -16,6 +16,11 @@
       {
         "command": "extension.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "panel-view-container.show",
+        "title": "Panel View",
+        "category": "vscode-webview-example"
       }
     ],
     "viewsContainers": {

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ViewProviderPanel = void 0;
+exports.ViewProviderSidebar = void 0;
 const abstract_1 = require("./abstract");
-class ViewProviderPanel extends abstract_1.AbstractViewProvider {
+class ViewProviderSidebar extends abstract_1.AbstractViewProvider {
     constructor(context, handlers) {
         super(context, handlers, {
             distDir: "out/webview",
@@ -19,5 +19,5 @@ class ViewProviderPanel extends abstract_1.AbstractViewProvider {
         webview.html = await this.getWebviewHtml(webview);
     }
 }
-exports.ViewProviderPanel = ViewProviderPanel;
+exports.ViewProviderSidebar = ViewProviderSidebar;
 //# sourceMappingURL=sidebar-view.js.map

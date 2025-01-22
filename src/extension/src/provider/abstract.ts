@@ -56,6 +56,7 @@ import {
       const webviewUri = webview
         .asWebviewUri(Uri.joinPath(this.context.extensionUri, distDir))
         .toString();
+
       // 需要在前端应用中插入的脚本，目的是：将上述 webviewUri 所指的目录告知前端应用，前端应用在定位资源时需要
       const injectInContent = `<script> window.${AbstractViewProvider.WEBVIEW_INJECT_IN_MARK} = "${webviewUri}"</script>`;
   
