@@ -27,7 +27,7 @@
       "activitybar": [
         {
           "id": "sidebar-view",
-          "title": "sidebar view example",
+          "title": "人言未必全真，听言只听三分。",  
           "icon": "assets/workspace.svg"
         }
       ]
@@ -37,7 +37,7 @@
         {
           "id": "sidebar-view-container",
           "type": "webview",
-          "name": "sidebar view"
+          "name": ""
         }
       ]
     }

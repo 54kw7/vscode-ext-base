@@ -1,1 +1,0 @@
-import{openBlock as t,createElementBlock as o,createElementVNode as n}from"vue";import{_ as r}from"./index-BOrcpZhh.js";const s={},c={class:"about"};function a(i,e){return t(),o("div",c,e[0]||(e[0]=[n("h1",null,"This is an about page",-1)]))}const f=r(s,[["render",a]]);export{f as default};

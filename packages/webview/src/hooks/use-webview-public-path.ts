@@ -4,5 +4,6 @@ import { join } from 'path-browserify'
 const webviewPublicPath = ((window as any).__webview_public_path__ as string) ?? ''
 export function useWebviewPublicPath(relativePath: string): Ref<string> {
   const path = join(webviewPublicPath, relativePath)
+  console.log("🚀 ~ useWebviewPublicPath ~ path:", path)
   return ref(path)
 }

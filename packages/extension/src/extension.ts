@@ -1,4 +1,4 @@
-import { commands, ExtensionContext, window, ViewColumn } from "vscode";
+import { commands, ExtensionContext, window, ViewColumn, Uri } from "vscode";
 import { ViewProviderSidebar } from "./provider/sidebar-view";
 import { ViewProviderPanel } from "./provider/panel-view";
 import { getHandlers } from "./handlers";
@@ -27,6 +27,7 @@ export function activate(context: ExtensionContext) {
           retainContextWhenHidden: true,
         }
       );
+      panel.iconPath = Uri.file(context.asAbsolutePath("assets/workspace.svg"));
       viewProviderPanel.resolveWebviewView(panel);
     }
   );
@@ -36,9 +37,9 @@ export function activate(context: ExtensionContext) {
   });
 
   context.subscriptions.push(
-    disposable,
     sidebarViewDisposable,
-    panelViewDisposable
+    panelViewDisposable,
+    disposable
   );
 }
 

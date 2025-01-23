@@ -1,16 +1,27 @@
 <script setup lang="ts">
-// import { useWebviewPublicPath } from '@/hooks/use-webview-public-path';
+import { useWebviewPublicPath } from '@/hooks/use-webview-public-path'
 import { RouterLink, RouterView } from 'vue-router'
+import logPath from '@/assets/logo.svg'
+console.log("🚀 ~ logPath:", logPath)
+
 import HelloWorld from './components/HelloWorld.vue'
+
+const logoUrl = useWebviewPublicPath(logPath)
+console.log("🚀 ~ logoUrl:", logoUrl)
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
+    <img alt="Vue logo" class="logo" :src="logoUrl" width="125" height="125" />
+    <a-space>
+    <a-button type="primary">Primary</a-button>
+    <a-button>Secondary</a-button>
+    <a-button type="dashed">Dashed</a-button>
+    <a-button type="outline">Outline</a-button>
+    <a-button type="text">Text</a-button>
+  </a-space>
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-11
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>

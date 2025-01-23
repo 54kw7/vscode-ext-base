@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "watch-only": "vite build --watch",
-    "type-check": "vue-tsc --build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },
@@ -20,6 +20,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@arco-design/web-vue": "^2.56.3",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.10.7",
     "@vitejs/plugin-vue": "^5.2.1",
@@ -29,13 +30,13 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.18.0",
     "eslint-plugin-vue": "^9.32.0",
+    "extension": "workspace:^",
     "jiti": "^2.4.2",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.4.2",
     "typescript": "~5.7.3",
     "vite": "^6.0.11",
     "vite-plugin-vue-devtools": "^7.7.0",
-    "vue-tsc": "^2.2.0",
-    "extension": "workspace:^"
+    "vue-tsc": "^2.2.0"
   }
 }

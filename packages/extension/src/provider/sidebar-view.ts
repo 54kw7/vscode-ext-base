@@ -20,6 +20,7 @@ export class ViewProviderSidebar
       localResourceRoots: [this.context.extensionUri],
     };
     this.exposeHandlers(webview);
-    webview.html = await this.getWebviewHtml(webview);
+    const html = await this.getWebviewHtml(webview);
+    webview.html = html;
   }
 }
