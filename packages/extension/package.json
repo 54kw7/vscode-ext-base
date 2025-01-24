@@ -21,13 +21,30 @@
         "command": "panel-view-container.show",
         "title": "Panel View",
         "category": "vscode-webview-example"
+      },
+      {
+        "command": "project-helper.build_deploy",
+        "title": "Build & Deploy"
+      },
+      {
+        "command": "project-helper.add_git_submodule",
+        "title": "Add Submodule"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "project-helper.build_deploy",
+          "group": "navigation",
+          "when": "resourceLangId == json"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
           "id": "sidebar-view",
-          "title": "人言未必全真，听言只听三分。",  
+          "title": "人言未必全真，听言只听三分。",
           "icon": "assets/workspace.svg"
         }
       ]
@@ -52,17 +69,19 @@
   },
   "dependencies": {
     "@jsonrpc-rx/server": "^0.2.1",
-    "html-modifier": "^1.2.0"
+    "@types/ssh2": "^1.15.4",
+    "html-modifier": "^1.2.0",
+    "node-ssh": "^13.2.0"
   },
   "devDependencies": {
-    "@types/vscode": "^1.96.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
-    "eslint": "^9.16.0",
-    "typescript": "^5.7.2",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.16.0",
+    "typescript": "^5.7.2"
   }
 }
