@@ -39,6 +39,7 @@ const onclick = async () => {
       <HelloWorld msg="You did it!" />
       <nav>
         <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/deploy">Deploy</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
