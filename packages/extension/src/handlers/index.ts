@@ -1,4 +1,4 @@
-import { commands, ExtensionContext, window, workspace } from "vscode";
+import { commands, ExtensionContext, window } from "vscode";
 import { Deferred } from "@jsonrpc-rx/server";
 
 export const getHandlers = (context: ExtensionContext) => {
@@ -7,7 +7,7 @@ export const getHandlers = (context: ExtensionContext) => {
       showInformationMessage: (message: string) => {
         // return commands.executeCommand("vscode.showInformationMessage", message);
         return window.showInformationMessage(message);
-      }
+      },
     },
     // 指令
     ...{

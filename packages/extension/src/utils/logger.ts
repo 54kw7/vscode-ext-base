@@ -54,4 +54,5 @@ class Logger {
   }
 }
 
-export default Logger;
+const logger = new Logger("Deploy Logs");
+export default logger;

@@ -3,6 +3,7 @@
   "displayName": "extension",
   "description": "vscode ext base kit",
   "version": "0.0.1",
+  "publisher": "yongliang",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -13,10 +14,6 @@
   "main": "./out/extension/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "extension.helloWorld",
-        "title": "Hello World"
-      },
       {
         "command": "panel-view-container.show",
         "title": "Panel View",

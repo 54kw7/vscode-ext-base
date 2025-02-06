@@ -10,7 +10,7 @@ export class ViewProviderSidebar
     super(context, handlers, {
       distDir: "out/webview",
       indexPath: "out/webview/index.html",
-    });
+    },'sidebar');
   }
 
   async resolveWebviewView(webviewView: WebviewView) {

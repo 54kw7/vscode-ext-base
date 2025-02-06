@@ -1,7 +1,9 @@
-import { commands, ExtensionContext, window, ViewColumn, Uri } from "vscode";
+import { commands, ExtensionContext, window } from "vscode";
 import { ViewProviderSidebar } from "./provider/sidebar-view";
-import { ViewProviderPanel } from "./provider/panel-view";
 import { getHandlers } from "./handlers";
+
+import * as fs from "fs";
+import * as path from "path";
 
 export function activate(context: ExtensionContext) {
   console.log('Congratulations, your extension "extension" is now active!');
@@ -15,32 +17,20 @@ export function activate(context: ExtensionContext) {
     { webviewOptions: { retainContextWhenHidden: true } }
   );
 
-  const panelViewDisposable = commands.registerCommand(
-    "panel-view-container.show",
-    () => {
-      const viewProviderPanel = new ViewProviderPanel(context, handlers);
-      const panel = window.createWebviewPanel(
-        "panel-view-container",
-        "Panel View",
-        ViewColumn.One,
-        {
-          retainContextWhenHidden: true,
-        }
-      );
-      panel.iconPath = Uri.file(context.asAbsolutePath("assets/workspace.svg"));
-      viewProviderPanel.resolveWebviewView(panel);
-    }
-  );
-
   const disposable = commands.registerCommand("extension.helloWorld", () => {
     window.showInformationMessage("Hello World from extension!");
   });
 
-  context.subscriptions.push(
-    sidebarViewDisposable,
-    panelViewDisposable,
-    disposable
-  );
+  context.subscriptions.push(sidebarViewDisposable, disposable);
+
+  const commandsDir = path.join(__dirname, "commands");
+  fs.readdirSync(commandsDir).forEach((file) => {
+    console.log("🚀 ~ fs.readdirSync ~ file:", file);
+    const commandModule = require(path.join(commandsDir, file));
+    if (commandModule.registerCommand) {
+      context.subscriptions.push(commandModule.registerCommand(context));
+    }
+  });
 }
 
 export function deactivate() {}

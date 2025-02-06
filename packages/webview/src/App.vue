@@ -6,7 +6,8 @@ import { Button, Space } from '@arco-design/web-vue/es'
 import logPath from '@/assets/logo.svg'
 
 import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import router from './router'
 
 const handlers = useHandlers()
 
@@ -15,14 +16,21 @@ const logoUrl = useWebviewPublicPath(logPath)
 const onViewPanelOpen = () => {
   handlers.execCommand('panel-view-container.show')
 }
+const activeTextEditor = () => {}
 const theme = ref('')
 const onclick = async () => {
   // const themes = handlers.getThemes();
-  const scripts =await handlers.getBuildScript()
+  const scripts = await handlers.getBuildScript()
   console.log('🚀 ~ onclick ~ scripts:', scripts)
   console.log('🚀 ~ onclick ~ themes:', theme)
   handlers.showInformationMessage('人生如逆旅，我亦是行人')
 }
+
+onMounted(() => {
+  const viewType = ((window as any).viewType as string) || '';
+  console.log('🚀 ~ onMounted ~ viewType:', viewType);
+  viewType == 'panel' ? router.push('/deploy') : router.push('/');
+})
 </script>
 
 <template>
@@ -32,7 +40,7 @@ const onclick = async () => {
       <a-button type="primary" @click="onViewPanelOpen">open panel view</a-button>
       <a-button @click="handlers.showInformationMessage('hello ext')">Secondary</a-button>
       <a-button type="dashed" @click="onclick">Dashed</a-button>
-      <a-button type="outline">Outline</a-button>
+      <a-button type="outline" @click="activeTextEditor">Outline</a-button>
       <a-button type="text">Text</a-button>
     </a-space>
     <div class="wrapper">

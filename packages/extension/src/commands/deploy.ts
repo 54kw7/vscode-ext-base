@@ -3,11 +3,11 @@ import * as cp from "child_process";
 import * as path from "path";
 import * as fs from "fs";
 import { NodeSSH } from "node-ssh";
-import Logger from "../utils/logger";
+import logger from "../utils/logger";
 
 const ssh = new NodeSSH();
 
-const logger = new Logger("Deploy Logs");
+// const logger = new Logger("Deploy Logs");
 logger.show();
 
 export function registerCommand() {
@@ -61,7 +61,7 @@ export async function buildAndDeploy() {
     }
 
     const scriptKeys = Object.keys(scripts);
-    console.log("🚀 ~ buildAndDeploy ~ scriptKeys:", scriptKeys)
+    console.log("🚀 ~ buildAndDeploy ~ scriptKeys:", scriptKeys);
     const selectedScript = await vscode.window.showQuickPick(scriptKeys, {
       placeHolder: "选择执行命令",
     });
