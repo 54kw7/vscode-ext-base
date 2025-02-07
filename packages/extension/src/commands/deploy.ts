@@ -7,9 +7,6 @@ import logger from "../utils/logger";
 
 const ssh = new NodeSSH();
 
-// const logger = new Logger("Deploy Logs");
-logger.show();
-
 export function registerCommand() {
   return vscode.commands.registerCommand("project-helper.build_deploy", () => {
     vscode.window.showInformationMessage("Hello from Command!");

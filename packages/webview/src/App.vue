@@ -16,7 +16,11 @@ const logoUrl = useWebviewPublicPath(logPath)
 const onViewPanelOpen = () => {
   handlers.execCommand('panel-view-container.show')
 }
-const activeTextEditor = () => {}
+const activeTextEditor = async () => {
+  const logger = await handlers.getLogger()
+  console.log("🚀 ~ activeTextEditor ~ logger:", logger)
+  logger.show()
+}
 const theme = ref('')
 const onclick = async () => {
   // const themes = handlers.getThemes();
@@ -27,14 +31,14 @@ const onclick = async () => {
 }
 
 onMounted(() => {
-  const viewType = ((window as any).viewType as string) || '';
-  console.log('🚀 ~ onMounted ~ viewType:', viewType);
-  viewType == 'panel' ? router.push('/deploy') : router.push('/');
+  const viewType = ((window as any).viewType as string) || ''
+  console.log('🚀 ~ onMounted ~ viewType:', viewType)
+  viewType == 'panel' ? router.push('/deploy') : router.push('/')
 })
 </script>
 
 <template>
-  <header>
+  <!-- <header>
     <img alt="Vue logo" class="logo" :src="logoUrl" width="125" height="125" />
     <a-space>
       <a-button type="primary" @click="onViewPanelOpen">open panel view</a-button>
@@ -44,14 +48,13 @@ onMounted(() => {
       <a-button type="text">Text</a-button>
     </a-space>
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/deploy">Deploy</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
-  </header>
+  </header> -->
 
   <RouterView />
 </template>

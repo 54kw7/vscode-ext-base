@@ -1,11 +1,12 @@
 import { commands, ExtensionContext, window } from "vscode";
 import { Deferred } from "@jsonrpc-rx/server";
+import logger from "../utils/logger";
+import { build } from "../core";
 
 export const getHandlers = (context: ExtensionContext) => {
   return {
     ...{
       showInformationMessage: (message: string) => {
-        // return commands.executeCommand("vscode.showInformationMessage", message);
         return window.showInformationMessage(message);
       },
     },
@@ -17,9 +18,19 @@ export const getHandlers = (context: ExtensionContext) => {
         return promise;
       },
     },
+    // build and deploy
     ...{
-      getBuildScript: () => {
-        return ["dev", "build", "serve"];
+      getBuildScript: async () => {
+        const commands = (await build.buildScripts()) || [];
+        const buildCommands = commands.filter((command) =>
+          command.includes("build")
+        );
+
+        return buildCommands;
+      },
+      execDeploy: async (config: any) => {
+        console.log("🚀 ~ execDeploy: ~ config:", config);
+        logger.show();
       },
     },
   };
