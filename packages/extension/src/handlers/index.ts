@@ -21,7 +21,7 @@ export const getHandlers = (context: ExtensionContext) => {
     // build and deploy
     ...{
       getBuildScript: async () => {
-        const commands = (await build.buildScripts()) || [];
+        const commands = (await build.scripts()) || [];
         const buildCommands = commands.filter((command) =>
           command.includes("build")
         );
@@ -31,6 +31,15 @@ export const getHandlers = (context: ExtensionContext) => {
       execDeploy: async (config: any) => {
         console.log("🚀 ~ execDeploy: ~ config:", config);
         logger.show();
+
+        await build.pack(config.script);
+        return await build.upload(config);
+      },
+      execUpload: async (config: any) => {
+        console.log("🚀 ~ execDeploy: ~ config:", config);
+        logger.show();
+
+        return await build.upload(config);
       },
     },
   };

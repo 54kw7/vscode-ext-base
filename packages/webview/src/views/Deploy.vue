@@ -9,9 +9,9 @@
         layout="horizontal"
         @submit="handleSubmit"
       >
-        <a-form-item field="buildScript" label="构建命令">
+        <a-form-item field="script" label="构建命令">
           <a-select
-            v-model="form.buildScript"
+            v-model="form.script"
             placeholder="选择构建命令..."
             :options="buildScripts"
             allow-clear
@@ -22,7 +22,7 @@
           </template>
         </a-form-item>
         <a-form-item field="buildArgs" label="构建参数">
-          <a-input v-model="form.buildArgs" placeholder="填写构建参数..." allow-clear />
+          <a-input v-model="form.args" placeholder="填写构建参数..." allow-clear />
           <template #extra>
             <div>非必填，构建参数</div>
           </template>
@@ -74,8 +74,9 @@
         </a-form-item>
         <a-form-item>
           <a-space>
-            <a-button html-type="submit">执行</a-button>
+            <a-button html-type="submit">打包+部署</a-button>
             <a-button @click="handleReset">重置</a-button>
+            <!-- <a-button html-type="submit">部署</a-button> -->
           </a-space>
         </a-form-item>
       </a-form>
@@ -106,23 +107,23 @@ const formRef = ref<FormInstance | null>(null)
 const buildScripts = ref<string[]>([])
 
 const buildCommand = computed(() => {
-  return form.buildScript ? `npm run ${form.buildScript}` : ''
+  return form.script ? `npm run ${form.script}` : ''
 })
 
 const form = reactive({
-  buildScript: '',
-  buildArgs: '',
+  script: 'build:prod',
+  args: '',
   host: '',
-  port: '',
+  port: '6666',
   password: '',
-  username: '',
-  remotePath: '',
-  url: '',
+  username: 'web',
+  remotePath: 'test',
+  url: 'http://www.baidu.com',
   embedProjects: [],
 })
 
 const rules = {
-  buildScript: [
+  script: [
     {
       required: true,
       message: '构建命令必填',
@@ -205,11 +206,18 @@ const embedProjects = [
   { label: '那曲职称', value: 'project6' },
 ]
 
-const handleSubmit = ({ values, errors }: { values: any; errors: any }) => {
+const handleSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   if (!errors) {
+    pageLoading.value = true
     const formData = toRaw(values)
     console.log('values:', formData)
-    handlers.execDeploy(formData)
+    try {
+      await handlers.execUpload(formData)
+    } catch (error) {
+      console.error('Failed to load build scripts:', error)
+    } finally {
+      pageLoading.value = false
+    }
   }
 }
 const handleReset = () => {

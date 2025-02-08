@@ -115,7 +115,7 @@ export async function buildAndDeploy() {
 
     // Step 3: 上传文件到服务器
     const deployConfig = {
-      host: "123.56.64.211",
+      host: "",
       port: 6666,
       username: "web",
       remotePath: `/alidata/server/vue/test`,

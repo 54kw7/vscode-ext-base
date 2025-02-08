@@ -1,11 +1,18 @@
-import { workspace } from "vscode";
+import { env, Uri, window, workspace } from "vscode";
 import logger from "../utils/logger";
 import * as path from "path";
 import * as fs from "fs";
+import * as cp from "child_process";
+import { NodeSSH } from "node-ssh";
 
-async function buildScripts() {
+const ssh = new NodeSSH();
+
+const workspaceFolder = workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+
+const remoteDir = "/alidata/server/vue/";
+
+async function scripts() {
   try {
-    const workspaceFolder = workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!workspaceFolder) {
       logger.errorBox(`没有打开的项目`);
       return;
@@ -31,4 +38,143 @@ async function buildScripts() {
   }
 }
 
-export { buildScripts };
+async function pack(selectedScript: string) {
+  try {
+    logger.info(`开始执行:npm run ${selectedScript}`);
+
+    const buildProcess = cp.spawn("npm", ["run", selectedScript], {
+      cwd: workspaceFolder,
+      shell: true,
+    });
+
+    buildProcess.stdout?.on("data", (data) => {
+      logger.info(`${data.toString()}`);
+    });
+
+    buildProcess.stderr?.on("data", (data) => {
+      const message = data.toString().trim();
+
+      if (message.toLowerCase().includes("error")) {
+        logger.errorBox(`${message}`);
+      } else {
+        logger.info(`${message}`);
+      }
+    });
+
+    const buildExitCode = await new Promise<number>((resolve) =>
+      buildProcess.on("close", resolve)
+    );
+
+    if (buildExitCode !== 0) {
+      window.showErrorMessage(
+        `Build process failed with exit code ${buildExitCode}.`
+      );
+      logger.errorBox(`构建失败，错误代码：${buildExitCode}`);
+      return;
+    }
+
+    logger.info(`打包完成`);
+  } catch (error) {
+    logger.errorBox(`获取scripts失败: ${error}`);
+  }
+}
+
+async function upload(deployConfig: any) {
+  try {
+    logger.info(`准备上传`);
+
+    const localBuildPath = path.join(workspaceFolder, "dist"); // 假设打包输出到 dist
+    if (!fs.existsSync(localBuildPath)) {
+      logger.errorBox(`没有找到打包后的文件夹: ${localBuildPath}`);
+      return;
+    }
+
+    const { host, port, username, password } = deployConfig;
+    await ssh.connect({
+      host,
+      port,
+      username,
+      password,
+    });
+    console.log("🚀 ~ upload ~ deployConfig:", deployConfig);
+
+    logger.info("开始上传");
+
+    await deployWithSCP(deployConfig, localBuildPath);
+  } catch (error) {
+    logger.error(`上传错误: ${error}`);
+    const retry = await window.showQuickPick(["重试", "取消"], {
+      placeHolder: "连接或上传失败，重试?",
+    });
+    if (retry !== "重试") {
+      return;
+    }
+  }
+}
+
+async function link(deployConfig: any, deployDir: string) {
+  try {
+    const { remotePath, url } = deployConfig;
+    ssh
+      .execCommand(`ln -sfn ./${deployDir} ./publish`, {
+        cwd: `${remoteDir}${remotePath}`,
+      })
+      .then(function (result) {
+        logger.infoBox(`部署完成${deployDir}`);
+      });
+
+    logger.info(`访问地址确认部署`);
+    logger.info(`地址：`);
+
+    await env.openExternal(Uri.parse(url));
+
+    ssh.dispose();
+  } catch (error) {
+    logger.errorBox(`意外错误:${error}`);
+  }
+}
+
+async function deployWithSCP(config: any, localPath: any) {
+  try {
+    logger.info(`开始连接服务器...`);
+
+    // logger.info(`SSH 连接成功`);
+
+    const now = new Date();
+    const deployDir = `dev_${now.getFullYear()}${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(
+      now.getHours()
+    ).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(
+      now.getSeconds()
+    ).padStart(2, "0")}`;
+
+    // 耗时计算
+    const startTime = Date.now();
+
+    const { port, username, host, remotePath } = config;
+
+    logger.info(`开始通过 SCP 上传文件夹...`);
+    const scpCommand = `scp -r -P ${port} ${localPath} ${username}@${host}:${remoteDir}${remotePath}/${deployDir}`;
+    console.log("🚀 ~ deployWithSCP ~ scpCommand:", scpCommand);
+    const result = await ssh.execCommand(scpCommand, {
+      cwd: process.cwd(),
+    });
+    console.log("🚀 ~ deployWithSCP ~ result:", result);
+
+    if (result.stderr) {
+      throw new Error(`SCP 上传失败: ${result.stderr}`);
+    }
+
+    const endTime = Date.now();
+    const elapsed = ((endTime - startTime) / 1000).toFixed(2); // 耗时秒数
+    logger.info(`文件夹上传完成，耗时 ${elapsed} 秒`);
+
+    logger.info("上传完成，正在配置...");
+    await link(config, deployDir);
+  } catch (error) {
+    logger.error(`部署失败: ${error}`);
+  }
+}
+
+export { scripts, pack, upload, link };
