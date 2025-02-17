@@ -27,8 +27,26 @@
             <div>非必填，构建参数</div>
           </template>
         </a-form-item>
+        <!-- <a-form-item field="script" label="构建命令">
+          <a-select
+            v-model="form.script"
+            placeholder="选择构建命令..."
+            :options="buildScripts"
+            allow-clear
+          >
+          </a-select>
+          <a-button class="user-setting">
+            <template #icon>
+              <icon-settings />
+            </template>
+          </a-button>
+          <template #extra>
+            <div>{{ buildCommand }}</div>
+          </template>
+        </a-form-item> -->
         <a-form-item field="host" label="服务器">
           <a-input v-model="form.host" placeholder="填写服务器ip..." allow-clear />
+
           <template #extra>
             <div>项目部署服务器的地址</div>
           </template>
@@ -105,6 +123,7 @@ const pageLoading = ref(true)
 const formRef = ref<FormInstance | null>(null)
 
 const buildScripts = ref<string[]>([])
+const embedProjects = ref<any[]>([])
 
 const buildCommand = computed(() => {
   return form.script ? `npm run ${form.script}` : ''
@@ -113,9 +132,9 @@ const buildCommand = computed(() => {
 const form = reactive({
   script: 'build:prod',
   args: '',
-  host: '',
-  port: '6666',
-  password: '',
+  host: 'localhost',
+  port: '6665',
+  password: 'aH..74..20240811..E#G.f',
   username: 'web',
   remotePath: 'test',
   url: 'http://www.baidu.com',
@@ -197,15 +216,6 @@ const rules = {
   ],
 }
 
-const embedProjects = [
-  { label: '龙江PDF', value: 'project2' },
-  { label: '高校手签', value: 'project3' },
-  { label: '龙江职称工单', value: 'project4' },
-  { label: '龙江职称微信', value: 'project1' },
-  { label: '龙江一件事工单', value: 'project5' },
-  { label: '那曲职称', value: 'project6' },
-]
-
 const handleSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   if (!errors) {
     pageLoading.value = true
@@ -228,6 +238,7 @@ onMounted(async () => {
   pageLoading.value = true
   try {
     buildScripts.value = await handlers.getBuildScript()
+    embedProjects.value = await handlers.getEmbedProjects()
     console.log('🚀 ~ buildScripts ~ buildScripts:', buildScripts.value)
   } catch (error) {
     console.error('Failed to load build scripts:', error)
@@ -237,4 +248,8 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.user-setting {
+  margin-left: 8px;
+}
+</style>

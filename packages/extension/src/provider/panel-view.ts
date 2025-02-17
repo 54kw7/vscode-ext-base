@@ -1,4 +1,10 @@
-import { ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from "vscode";
+import {
+  ExtensionContext,
+  Uri,
+  ViewColumn,
+  WebviewPanel,
+  window,
+} from "vscode";
 import { HandlerConfig } from "@jsonrpc-rx/server";
 import { AbstractViewProvider } from "./abstract";
 
@@ -33,14 +39,14 @@ export class ViewProviderPanel extends AbstractViewProvider {
     } else {
       const panel = window.createWebviewPanel(
         "panel-view-container",
-        "Panel View",
+        "magic kit",
         ViewColumn.One,
         {
           enableScripts: true,
           localResourceRoots: [context.extensionUri],
         }
       );
-      panel.iconPath = Uri.file(context.asAbsolutePath("assets/workspace.svg"));
+      panel.iconPath = Uri.file(context.asAbsolutePath("assets/capsule.svg"));
       const provider = new ViewProviderPanel(context, handlers);
       provider.resolveWebviewView(panel);
 

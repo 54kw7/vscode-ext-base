@@ -173,7 +173,7 @@ export async function buildAndDeploy() {
 
     await vscode.env.openExternal(
       vscode.Uri.parse(
-        "http://123.56.64.211:12020/noticeContent?id=1871421796144324609"
+        "http://localhost:12020/noticeContent?id=1871421796144324609"
       )
     );
 

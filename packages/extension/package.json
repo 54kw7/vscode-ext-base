@@ -16,7 +16,7 @@
     "commands": [
       {
         "command": "panel-view-container.show",
-        "title": "Panel View",
+        "title": "Build & Deploy",
         "category": "vscode-webview-example"
       },
       {
@@ -34,6 +34,11 @@
           "command": "project-helper.build_deploy",
           "group": "navigation",
           "when": "resourceLangId == json"
+        },
+        {
+          "command": "panel-view-container.show",
+          "group": "navigation",
+          "when": "resourceLangId == vue"
         }
       ]
     },
@@ -62,7 +67,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "package": "pnpm vsce package"
   },
   "dependencies": {
     "@jsonrpc-rx/server": "^0.2.1",
