@@ -62,3 +62,4 @@ export const getHandlers = (context: ExtensionContext) => {
     },
   };
 };
+

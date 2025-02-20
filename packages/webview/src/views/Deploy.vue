@@ -134,7 +134,7 @@ const form = reactive({
   args: '',
   host: 'localhost',
   port: '6665',
-  password: 'aH..74..20240811..E#G.f',
+  password: '',
   username: 'web',
   remotePath: 'test',
   url: 'http://www.baidu.com',

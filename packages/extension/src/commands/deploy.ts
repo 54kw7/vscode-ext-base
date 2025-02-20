@@ -2,10 +2,12 @@ import * as vscode from "vscode";
 import * as cp from "child_process";
 import * as path from "path";
 import * as fs from "fs";
-import { NodeSSH } from "node-ssh";
+// import { NodeSSH } from "node-ssh";
 import logger from "../utils/logger";
 
-const ssh = new NodeSSH();
+const NodeSSH = require("node-ssh");
+
+const ssh = new NodeSSH.NodeSSH();
 
 export function registerCommand() {
   return vscode.commands.registerCommand("project-helper.build_deploy", () => {
@@ -164,7 +166,7 @@ export async function buildAndDeploy() {
       .execCommand(`ln -sfn ./${deployDir} ./publish`, {
         cwd: `${deployConfig.remotePath}`,
       })
-      .then(function (result) {
+      .then(function (result:any) {
         logger.infoBox(`部署完成${deployDir}`);
       });
 

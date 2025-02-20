@@ -2,7 +2,7 @@
   "name": "extension",
   "displayName": "extension",
   "description": "vscode ext base kit",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "publisher": "yongliang",
   "engines": {
     "vscode": "^1.96.0"
@@ -10,6 +10,10 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "activationEvents": [],
   "main": "./out/extension/extension.js",
   "contributes": {
@@ -62,13 +66,16 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
+    "vscode:prepublish": "pnpm run build-rollup",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "package": "pnpm vsce package"
+    "clear": "rimraf ./out && rimraf ./node_modules",
+    "clear:out": "rimraf ./out/extension",
+    "build-rollup": "pnpm run clear:out && rollup -c",
+    "package": "pnpm vsce package  --no-dependencies"
   },
   "dependencies": {
     "@jsonrpc-rx/server": "^0.2.1",
@@ -77,6 +84,9 @@
     "node-ssh": "^13.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.96.0",
@@ -85,6 +95,9 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.16.0",
+    "rollup": "^4.34.8",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.8.1",
     "typescript": "^5.7.2"
   }
 }

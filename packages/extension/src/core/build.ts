@@ -3,9 +3,11 @@ import logger from "../utils/logger";
 import * as path from "path";
 import * as fs from "fs";
 import * as cp from "child_process";
-import { NodeSSH } from "node-ssh";
+// import { NodeSSH } from "node-ssh";
+const NodeSSH = require("node-ssh");
 
-const ssh = new NodeSSH();
+
+const ssh = new NodeSSH.NodeSSH();
 
 const workspaceFolder = workspace.workspaceFolders?.[0]?.uri.fsPath || "";
 
@@ -134,7 +136,7 @@ async function link(deployConfig: any, deployDir: string) {
       .execCommand(`ln -sfn ./${deployDir} ./publish`, {
         cwd: `${remoteDir}${remotePath}`,
       })
-      .then(async function (result) {
+      .then(async function (result:any) {
         await embedLink(deployConfig, deployDir);
         logger.infoBox(`部署完成${deployDir}`);
       });
