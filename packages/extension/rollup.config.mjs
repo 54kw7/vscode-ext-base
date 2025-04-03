@@ -12,10 +12,11 @@ const plugins = [
   }),
   json(),
   commonjs({
-    include: /node_modules/
+    // include: /node_modules/
+    // include: ['node_modules/**']
   }),
   resolve({
-    extensions: [".ts", ".js"],
+    extensions: [".ts", ".js",".node"],
   }),
 ];
 
@@ -23,4 +24,5 @@ export default {
   input: "./src/extension.ts",
   output: [{ format: "cjs", file: pkg.main }],
   plugins,
+  external: ["vscode"],
 };

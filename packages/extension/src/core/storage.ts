@@ -18,6 +18,7 @@ class ConfigStorage {
   // 读取配置文件
   readConfig() {
     if (fs.existsSync(this.configFile)) {
+      console.log("🚀 ~ ConfigStorage ~ readConfig ~ configFile:", "存在");
       const rawData = fs.readFileSync(this.configFile);
       return JSON.parse(rawData);
     }
@@ -33,6 +34,7 @@ class ConfigStorage {
   // 存储单个键值对
   save(key: string | number, value: any) {
     const config = this.readConfig();
+    console.log("🚀 ~ ConfigStorage ~ save ~ config:", config);
     config[key] = value;
     this.writeConfig(config);
   }
@@ -53,6 +55,6 @@ class ConfigStorage {
 
 const configStorage = new ConfigStorage();
 
-module.exports = configStorage;
+// module.exports = configStorage;
 
 export default configStorage;

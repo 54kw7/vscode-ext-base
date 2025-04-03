@@ -9,6 +9,7 @@
         layout="horizontal"
         @submit="handleSubmit"
       >
+        <a-divider orientation="left">构建</a-divider>
         <a-form-item field="script" label="构建命令">
           <a-select
             v-model="form.script"
@@ -44,6 +45,7 @@
             <div>{{ buildCommand }}</div>
           </template>
         </a-form-item> -->
+        <a-divider orientation="left">服务器</a-divider>
         <a-form-item field="host" label="服务器">
           <a-input v-model="form.host" placeholder="填写服务器ip..." allow-clear />
 
@@ -55,6 +57,16 @@
           <a-input v-model="form.port" placeholder="填写服务器端口，默认22..." allow-clear />
           <template #extra>
             <div>项目部署服务器的端口</div>
+          </template>
+        </a-form-item>
+        <a-form-item field="user" label="用户">
+          <a-select v-model="form.user" placeholder="选择用户..." :options="testUsers" allow-clear>
+            <template #footer>
+              <div style="padding: 6px 0" @click="handleAddUser">添加新用户</div>
+            </template>
+          </a-select>
+          <template #extra>
+            <div>{{ buildCommand }}</div>
           </template>
         </a-form-item>
         <a-form-item field="username" label="用户名">
@@ -69,6 +81,7 @@
             <div>项目部署服务器的密码</div>
           </template>
         </a-form-item>
+        <a-divider orientation="left">部署</a-divider>
         <a-form-item field="remotePath" label="远程路径">
           <a-input v-model="form.remotePath" placeholder="填写远程路径..." allow-clear>
             <template #prepend> /alidata/server/vue/ </template></a-input
@@ -83,6 +96,7 @@
             <div>项目访问地址</div>
           </template>
         </a-form-item>
+        <a-divider orientation="left">扩展</a-divider>
         <a-form-item field="embedProjects" label="关联项目">
           <a-checkbox-group v-model="form.embedProjects" :options="embedProjects">
           </a-checkbox-group>
@@ -100,6 +114,18 @@
       </a-form>
       {{ form }}
     </a-spin>
+    <a-modal
+      v-model:visible="visible"
+      @cancel="handleCancel"
+      :on-before-ok="handleBeforeOk"
+      unmountOnClose
+    >
+      <template #title> Title </template>
+      <div>
+        You can customize modal body text by the current situation. This modal will be closed
+        immediately once you press the OK button.
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -119,6 +145,7 @@ import { useHandlers } from '@/hooks'
 const handlers = useHandlers()
 
 const pageLoading = ref(true)
+const visible = ref(false)
 
 const formRef = ref<FormInstance | null>(null)
 
@@ -128,6 +155,12 @@ const embedProjects = ref<any[]>([])
 const buildCommand = computed(() => {
   return form.script ? `npm run ${form.script}` : ''
 })
+
+const testUsers = ref([
+  { label: 'web', value: 'web' },
+  { label: 'test', value: 'test' },
+  { label: 'admin', value: 'admin' },
+])
 
 const form = reactive({
   script: 'build:prod',
@@ -139,6 +172,7 @@ const form = reactive({
   remotePath: 'test',
   url: 'http://www.baidu.com',
   embedProjects: [],
+  user: 'web',
 })
 
 const rules = {
@@ -232,6 +266,20 @@ const handleSubmit = async ({ values, errors }: { values: any; errors: any }) =>
 }
 const handleReset = () => {
   formRef.value?.resetFields()
+}
+
+const handleBeforeOk = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+  return true
+  // prevent close
+  // return false;
+}
+const handleCancel = () => {
+  visible.value = false
+}
+
+const handleAddUser = async () => {
+  visible.value = true
 }
 
 onMounted(async () => {

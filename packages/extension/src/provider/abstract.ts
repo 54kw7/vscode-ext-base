@@ -9,6 +9,8 @@ import {
   import { join } from "path";
   import { modifyHtml } from "html-modifier";
   import { HandlerConfig, JsonrpcServer, expose } from "@jsonrpc-rx/server";
+
+  // const modifyHtml=require('html-modifier').modifyHtml;
   
   export type ViewProviderOptions = {
     distDir: string;

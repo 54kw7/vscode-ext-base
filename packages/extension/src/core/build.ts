@@ -3,14 +3,9 @@ import logger from "../utils/logger";
 import * as path from "path";
 import * as fs from "fs";
 import * as cp from "child_process";
-// import { NodeSSH } from "node-ssh";
-const NodeSSH = require("node-ssh");
-
-
-const ssh = new NodeSSH.NodeSSH();
+import SSH2Promise from "ssh2-promise";
 
 const workspaceFolder = workspace.workspaceFolders?.[0]?.uri.fsPath || "";
-
 const remoteDir = "/alidata/server/vue/";
 
 async function scripts() {
@@ -82,6 +77,13 @@ async function pack(config: any) {
 }
 
 async function upload(deployConfig: any) {
+  const ssh = new SSH2Promise({
+    host: deployConfig.host,
+    port: deployConfig.port,
+    username: deployConfig.username,
+    password: deployConfig.password,
+  });
+
   try {
     logger.info(`准备上传`);
 
@@ -91,13 +93,7 @@ async function upload(deployConfig: any) {
       return;
     }
 
-    const { host, port, username, password, remotePath } = deployConfig;
-    await ssh.connect({
-      host,
-      port,
-      username,
-      password,
-    });
+    await ssh.connect();
     console.log("🚀 ~ upload ~ deployConfig:", deployConfig);
 
     logger.info("开始上传");
@@ -110,14 +106,16 @@ async function upload(deployConfig: any) {
     ).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(
       now.getSeconds()
     ).padStart(2, "0")}`;
-
-    // await deployWithSCP(deployConfig, localBuildPath);
+    await ssh.exec(
+      `cd ${remoteDir}${deployConfig.remotePath} && mkdir -p ${deployDir}`
+    );
     await uploadWithProgress(
+      ssh,
       localBuildPath,
-      `${remoteDir}${remotePath}/${deployDir}`
+      `${remoteDir}${deployConfig.remotePath}/${deployDir}`
     );
     logger.info("上传完成，正在配置...");
-    await link(deployConfig, deployDir);
+    await link(ssh, deployConfig, deployDir);
   } catch (error) {
     logger.error(`上传错误: ${error}`);
     const retry = await window.showQuickPick(["重试", "取消"], {
@@ -126,113 +124,69 @@ async function upload(deployConfig: any) {
     if (retry !== "重试") {
       return;
     }
+  } finally {
+    ssh.close();
   }
 }
 
-async function link(deployConfig: any, deployDir: string) {
+async function link(ssh: SSH2Promise, deployConfig: any, deployDir: string) {
   try {
     const { remotePath, url } = deployConfig;
-    ssh
-      .execCommand(`ln -sfn ./${deployDir} ./publish`, {
-        cwd: `${remoteDir}${remotePath}`,
-      })
-      .then(async function (result:any) {
-        await embedLink(deployConfig, deployDir);
-        logger.infoBox(`部署完成${deployDir}`);
-      });
+    await ssh.exec(
+      `cd ${remoteDir}${remotePath} && ln -sfn ./${deployDir} ./publish`
+    );
+    await embedLink(ssh, deployConfig, deployDir);
+    logger.infoBox(`部署完成${deployDir}`);
 
     logger.info(`访问地址确认部署`);
     logger.info(`地址：${url}`);
 
     await env.openExternal(Uri.parse(url));
-
-    ssh.dispose();
   } catch (error) {
     logger.errorBox(`意外错误:${error}`);
   }
 }
 
-async function embedLink(deployConfig: any, deployDir: string) {
+async function embedLink(
+  ssh: SSH2Promise,
+  deployConfig: any,
+  deployDir: string
+) {
   try {
     const { remotePath, embedProjects } = deployConfig;
 
     for (const embedProject of embedProjects) {
-      await ssh.execCommand(
-        `ln -sfn ${remoteDir}${remotePath}/${embedProject} ./${embedProject}`,
-        {
-          cwd: `${remoteDir}${remotePath}/publish`,
-        }
+      await ssh.exec(
+        ` cd ${remoteDir}${remotePath}/publish && ln -sfn ${remoteDir}${remotePath}/${embedProject} ./${embedProject}`
       );
     }
-
-    // await ssh.execCommand(`ln -sfn ./${deployDir} ./publish`, {
-    //   cwd: `${remoteDir}${remotePath}`,
-    // });
   } catch (error) {
     logger.errorBox(`意外错误:${error}`);
   }
 }
 
-async function deployWithSCP(config: any, localPath: any) {
-  try {
-    logger.info(`开始连接服务器...`);
-
-    // logger.info(`SSH 连接成功`);
-
-    const now = new Date();
-    const deployDir = `dev_${now.getFullYear()}${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(
-      now.getHours()
-    ).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(
-      now.getSeconds()
-    ).padStart(2, "0")}`;
-
-    // 耗时计算
-    const startTime = Date.now();
-
-    const { port, username, host, remotePath } = config;
-
-    logger.info(`开始上传文件夹...`);
-    // const scpCommand = `scp -r -P ${port} ${localPath} ${username}@${host}:${remoteDir}${remotePath}/${deployDir}`;
-    // const scpCommand = `scp -r -P 6666 /Users/yongliangzhao/Projects/JiuZhou/university-product-recruit/dist web@localhost:/alidata/server/vue/test/dev_20250210_131734`;
-    const scpCommand = "cd /alidata/server/vue/test && ls -a";
-    console.log("🚀 ~ deployWithSCP ~ scpCommand:", process.cwd());
-    const result = await ssh.execCommand(scpCommand, {
-      cwd: process.cwd(),
-    });
-    console.log("🚀 ~ deployWithSCP ~ result:", result);
-
-    if (result.stderr) {
-      throw new Error(`SCP 上传失败: ${result.stderr}`);
-    }
-
-    const endTime = Date.now();
-    const elapsed = ((endTime - startTime) / 1000).toFixed(2); // 耗时秒数
-    logger.info(`文件夹上传完成，耗时 ${elapsed} 秒`);
-
-    logger.info("上传完成，正在配置...");
-    await link(config, deployDir);
-  } catch (error) {
-    logger.error(`部署失败: ${error}`);
-  }
-}
-
-async function uploadWithProgress(localDir: any, remoteDir: any) {
+async function uploadWithProgress(
+  ssh: SSH2Promise,
+  localDir: string,
+  remoteDir: string
+) {
   const files = fs.readdirSync(localDir);
   const totalFiles = files.length;
   let uploadedCount = 0;
 
   for (const file of files) {
     const localFilePath = path.join(localDir, file);
+    console.log("🚀 ~ uploadWithProgress ~ localFilePath:", localFilePath);
     const remoteFilePath = `${remoteDir}/${file}`;
 
+    console.log("🚀 ~ uploadWithProgress ~ remoteFilePath:", remoteFilePath);
     if (fs.lstatSync(localFilePath).isDirectory()) {
       // 如果是子目录，可以递归处理
-      await uploadWithProgress(localFilePath, remoteFilePath);
+      await ssh.exec(`mkdir -p ${remoteFilePath}`);
+      await uploadWithProgress(ssh, localFilePath, remoteFilePath);
     } else {
       try {
-        await ssh.putFile(localFilePath, remoteFilePath);
+        await ssh.sftp().fastPut(localFilePath, remoteFilePath);
         uploadedCount++;
         logger.info(`[进度]: 已上传 ${uploadedCount}/${totalFiles}: ${file}`);
       } catch (error) {
